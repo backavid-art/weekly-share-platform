@@ -63,6 +63,14 @@ body {
   padding: 34px 10px 22px;
 }
 
+.site-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .eyebrow {
   margin: 0;
   font-size: 0.82rem;
@@ -90,6 +98,26 @@ h4 {
   margin: 10px 0 0;
   color: var(--muted);
   max-width: 760px;
+}
+
+.quick-link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid #7ea3a0;
+  background: #edf8f6;
+  color: #124846;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.quick-link:hover {
+  background: #d9efeb;
 }
 
 .layout {
@@ -141,6 +169,24 @@ h4 {
 .week-summary {
   margin: 0;
   font-size: 1rem;
+}
+
+.article-heading {
+  margin: 2px 0;
+  font-size: 1.05rem;
+}
+
+.article-paragraph {
+  margin: 0;
+  color: #2f3540;
+}
+
+.article-bullets {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+  color: #2f3540;
 }
 
 .section-block {
@@ -221,6 +267,88 @@ h4 {
   font-size: 0.9rem;
 }
 
+.writer-layout {
+  position: relative;
+  z-index: 1;
+  max-width: 980px;
+  margin: 0 auto;
+  display: grid;
+  gap: 16px;
+}
+
+.writer-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr;
+}
+
+.writer-grid.two {
+  grid-template-columns: 1fr;
+}
+
+.writer-layout label {
+  display: grid;
+  gap: 6px;
+  font-weight: 650;
+  font-size: 0.93rem;
+  color: #2f3540;
+}
+
+.writer-layout input,
+.writer-layout textarea {
+  width: 100%;
+  border: 1px solid #c5c5c0;
+  border-radius: 10px;
+  background: #fff;
+  padding: 10px 11px;
+  font: inherit;
+  color: inherit;
+}
+
+.writer-layout textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.writer-layout .article-input {
+  min-height: 200px;
+}
+
+.writer-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.writer-actions button {
+  height: 42px;
+  border: 1px solid #9abbb8;
+  background: #dff2ef;
+  color: #154846;
+  border-radius: 12px;
+  padding: 0 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.writer-actions button.secondary {
+  background: #f1f2f4;
+  border-color: #cccfd6;
+  color: #2e3642;
+}
+
+.snippet-box {
+  margin: 0;
+  white-space: pre-wrap;
+  background: #0f1418;
+  color: #d7e4f7;
+  border-radius: 12px;
+  border: 1px solid #283a53;
+  padding: 12px;
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
 @media (min-width: 960px) {
   body {
     padding: 28px;
@@ -236,5 +364,9 @@ h4 {
     top: 20px;
     max-height: calc(100vh - 40px);
     overflow: auto;
+  }
+
+  .writer-grid.two {
+    grid-template-columns: 1fr 1fr;
   }
 }

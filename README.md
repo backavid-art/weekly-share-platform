@@ -5,12 +5,27 @@
 ## 파일 구조
 
 - `index.html`: 메인 페이지
+- `write.html`: 입력형 기사 작성기
 - `assets/styles.css`: 반응형 디자인
 - `assets/app.js`: 주간 데이터 렌더링
+- `assets/writer.js`: 작성기 코드 생성 스크립트
 - `content/weeks.js`: 매주 수정하는 데이터 파일
 - `assets/images/`: 주차별 이미지 보관
 
-## 매주 업데이트 (5분 루틴)
+## 가장 쉬운 작성법 (작성기 사용)
+
+1. `write.html` 열기
+2. 입력창에 제목/요약/본문/링크 입력
+3. `코드 생성` 클릭
+4. 생성된 코드를 복사해서 `content/weeks.js`의 `weeks` 배열 맨 위에 붙여넣기
+5. 저장 후 페이지 확인
+
+본문 입력 팁:
+- 소제목은 `## 소제목`
+- 목록은 `- 항목` 형식
+- 빈 줄로 문단 구분
+
+## 직접 수정 방식 (기존 방식)
 
 1. 새 이미지를 `assets/images/`에 추가
    - 예: `assets/images/weekly-2026-04-23.jpg`

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>기사 작성기 | 주간 기사 공유 플랫폼</title>
+    <meta name="description" content="주간 기사 공유용 글을 쉽게 작성해 weeks.js 코드로 변환" />
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <header class="site-header">
+      <div class="site-header-top">
+        <div>
+          <p class="eyebrow">Writer Tool</p>
+          <h1>기사 작성기</h1>
+          <p class="site-intro">
+            입력창에 내용만 쓰면 <code>content/weeks.js</code>에 붙여넣을 코드가 자동 생성됩니다.
+          </p>
+        </div>
+        <a class="quick-link" href="./index.html">메인 페이지 보기</a>
+      </div>
+    </header>
+
+    <main class="writer-layout">
+      <section class="panel">
+        <div class="panel-header">
+          <h2>1) 기사 내용 입력</h2>
+          <p class="subtle">날짜, 제목, 본문, 링크만 채우세요.</p>
+        </div>
+
+        <div class="writer-grid two">
+          <label>
+            주차 ID
+            <input id="id" type="text" placeholder="2026-04-23" />
+          </label>
+          <label>
+            날짜 표시
+            <input id="dateLabel" type="text" placeholder="2026.04.23 (목)" />
+          </label>
+        </div>
+
+        <div class="writer-grid">
+          <label>
+            제목
+            <input id="title" type="text" placeholder="이번 주 주요 기사 요약" />
+          </label>
+
+          <label>
+            한 줄 요약
+            <input id="summary" type="text" placeholder="이번 주 핵심 흐름을 한 줄로 정리" />
+          </label>
+
+          <label>
+            대표 이미지 경로/URL
+            <input id="coverImage" type="text" placeholder="./assets/images/weekly-2026-04-23.jpg" />
+          </label>
+
+          <label>
+            본문 (쉬운 작성 모드)
+            <textarea
+              id="articleText"
+              class="article-input"
+              placeholder="## 핵심 정리\n이번 주 핵심을 2~3문장으로 입력\n\n## 주요 포인트\n- 포인트 1\n- 포인트 2\n\n## 실천 제안\n한 가지 실천 제안"
+            ></textarea>
+          </label>
+
+          <label>
+            참고 링크 (한 줄에 하나, 형식: 제목 | URL)
+            <textarea id="links" placeholder="원문 기사 | https://example.com/article\n관련 기사 | https://example.com/related"></textarea>
+          </label>
+
+          <label>
+            첨부 자료 (한 줄에 하나, 형식: 제목 | URL)
+            <textarea id="attachments" placeholder="주간 PDF | https://example.com/weekly.pdf"></textarea>
+          </label>
+        </div>
+
+        <div class="writer-actions">
+          <button id="generate" type="button">코드 생성</button>
+          <button id="copy" type="button" class="secondary">코드 복사</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>2) 생성된 코드</h2>
+          <p class="subtle">이 코드를 weeks 배열 맨 위에 붙여넣으세요.</p>
+        </div>
+        <pre id="snippet" class="snippet-box">아직 생성된 코드가 없습니다.</pre>
+      </section>
+    </main>
+
+    <script src="./assets/writer.js"></script>
+  </body>
+</html>

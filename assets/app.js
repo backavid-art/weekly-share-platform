@@ -47,6 +47,8 @@ function renderWeek(week) {
     )
     .join("");
 
+  const articleTextHtml = renderArticleText(week.articleText || "");
+
   const linksHtml = (week.links || [])
     .map(
       (link) => `<li><a href="${escapeAttr(link.url)}" target="_blank" rel="noreferrer">${escapeHtml(
@@ -71,10 +73,51 @@ function renderWeek(week) {
     }
     <h3>${escapeHtml(week.title || "제목 없음")}</h3>
     <p class="week-summary">${escapeHtml(week.summary || "")}</p>
+    ${articleTextHtml}
     ${sectionsHtml}
     ${linksHtml ? `<h4>참고 링크</h4><ul class="link-list">${linksHtml}</ul>` : ""}
     ${attachmentsHtml ? `<h4>첨부 자료</h4><ul class="attachment-list">${attachmentsHtml}</ul>` : ""}
   `;
+}
+
+function renderArticleText(articleText) {
+  const normalized = String(articleText).replaceAll("\r\n", "\n").trim();
+  if (!normalized) return "";
+
+  const blocks = normalized.split(/\n\s*\n/).map((part) => part.trim()).filter(Boolean);
+
+  return blocks
+    .map((block) => {
+      const lines = block
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+      if (lines.length === 0) return "";
+
+      const isBulletBlock = lines.every((line) => line.startsWith("- "));
+      if (isBulletBlock) {
+        const items = lines
+          .map((line) => `<li>${escapeHtml(line.slice(2).trim())}</li>`)
+          .join("");
+        return `<ul class="article-bullets">${items}</ul>`;
+      }
+
+      if (lines[0].startsWith("## ")) {
+        const heading = escapeHtml(lines[0].slice(3).trim());
+        const body = lines
+          .slice(1)
+          .map((line) => escapeHtml(line))
+          .join("<br>");
+        return `<section class="section-block"><h4 class="article-heading">${heading}</h4>${
+          body ? `<p class="article-paragraph">${body}</p>` : ""
+        }</section>`;
+      }
+
+      const paragraph = lines.map((line) => escapeHtml(line)).join("<br>");
+      return `<p class="article-paragraph">${paragraph}</p>`;
+    })
+    .join("");
 }
 
 function renderArchive(weeks, currentId, onPick) {
