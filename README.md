@@ -54,10 +54,11 @@ python3 -m http.server 8080
 ### 3) GitHub Pages
 
 1. 이 폴더를 GitHub 저장소에 push
-2. 기본 브랜치를 `main`으로 사용
-3. Actions가 자동 배포
+2. GitHub 저장소 Settings > Pages 이동
+3. Source: Deploy from a branch
+4. Branch: `main` / Folder: `/ (root)` 선택 후 Save
 
-`.github/workflows/pages.yml`과 `.nojekyll`이 포함되어 있어 바로 동작합니다.
+`.nojekyll`이 포함되어 있어 정적 파일이 바로 동작합니다.
 
 ## 블로그 병행 추천 운영
 
