@@ -51,6 +51,7 @@ function renderWeek(week) {
   const galleryHtml = renderGallery(week.galleryImages || []);
   const serviceOrderHtml = renderServiceOrder(week.serviceOrder || []);
   const eventsHtml = renderEvents(week.events || []);
+  const bulletinSectionsHtml = renderBulletinSections(week.bulletinSections || []);
 
   const linksHtml = (week.links || [])
     .map(
@@ -78,6 +79,7 @@ function renderWeek(week) {
     <p class="week-summary">${escapeHtml(week.summary || "")}</p>
     ${serviceOrderHtml}
     ${eventsHtml}
+    ${bulletinSectionsHtml}
     ${articleTextHtml}
     ${sectionsHtml}
     ${galleryHtml}
@@ -210,10 +212,35 @@ function renderEvents(events) {
 
   return `
     <section class="info-block">
-      <h4 class="info-title">행사 안내</h4>
+      <h4 class="info-title">교회 소식/행사 안내</h4>
       <div class="events-grid">${cards}</div>
     </section>
   `;
+}
+
+function renderBulletinSections(sections) {
+  if (!Array.isArray(sections) || sections.length === 0) return "";
+
+  const html = sections
+    .filter((section) => !/예배 순서|교회 소식|행사/.test(section.title || ""))
+    .map((section) => {
+      const lines = Array.isArray(section.lines) ? section.lines : [];
+      const rows = lines
+        .map((line) => `<li>${escapeHtml(String(line))}</li>`)
+        .join("");
+
+      if (!rows) return "";
+
+      return `
+        <section class="info-block bulletin-section">
+          <h4 class="info-title">${escapeHtml(section.title || "주보 항목")}</h4>
+          <ul class="bulletin-lines">${rows}</ul>
+        </section>
+      `;
+    })
+    .join("");
+
+  return html;
 }
 
 function renderArchive(weeks, currentId, onPick) {

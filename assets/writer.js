@@ -18,12 +18,13 @@
       dateLabel: dateInfo.dateLabel,
       title: news.title || bulletin.title || "이번 주 소식 및 주보",
       summary: news.summary || "이번 주 주요 소식과 예배 안내를 정리했습니다.",
-      coverImage: news.coverImage || bulletin.coverImage || (news.galleryImages[0] ? news.galleryImages[0].url : ""),
+      coverImage: news.coverImage || (news.galleryImages[0] ? news.galleryImages[0].url : ""),
       galleryImages: news.galleryImages,
       articleText: news.articleText,
       links: news.links,
       serviceOrder: bulletin.serviceOrder,
-      events: bulletin.events
+      events: bulletin.events,
+      bulletinSections: bulletin.bulletinSections
     };
 
     const cleaned = removeEmptyFields(weekObject);
@@ -132,16 +133,15 @@ function parseBulletinRaw(rawText) {
   const normalized = rawText.replaceAll("\r\n", "\n");
   const lines = normalized.split("\n");
 
-  let mode = "none";
   let title = "";
   let dateLabelRaw = "";
-  const serviceOrder = [];
-  const eventLines = [];
+  const sections = [];
+  let current = null;
 
   lines.forEach((line, index) => {
     const trimmed = line.trim();
     if (!trimmed) {
-      if (mode === "events") eventLines.push("");
+      if (current) current.lines.push("");
       return;
     }
 
@@ -149,58 +149,150 @@ function parseBulletinRaw(rawText) {
       title = trimmed;
     }
 
-    if (/^날짜\s*:/.test(trimmed)) {
-      dateLabelRaw = trimmed.split(":").slice(1).join(":").trim();
+    if (!dateLabelRaw) {
+      const dateMatch = trimmed.match(/(\d{4}[.\-/]\d{1,2}[.\-/]\d{1,2}[^\n]*)/);
+      if (dateMatch) dateLabelRaw = dateMatch[1].trim();
+    }
+
+    if (isBulletinHeader(trimmed)) {
+      current = { title: normalizeHeader(trimmed), lines: [] };
+      sections.push(current);
       return;
     }
 
-    if (/예배\s*순서|주일\s*예배\s*순서/i.test(trimmed)) {
-      mode = "service";
-      return;
+    if (!current) {
+      current = { title: "주보 안내", lines: [] };
+      sections.push(current);
     }
 
-    if (/행사\s*안내|교회\s*소식|광고/i.test(trimmed)) {
-      mode = "events";
-      return;
-    }
-
-    if (mode === "service") {
-      if (looksLikeOrderLine(trimmed)) {
-        serviceOrder.push(parseOrderLine(trimmed));
-        return;
-      }
-
-      if (/[:]/.test(trimmed) || /행사|소식|광고/.test(trimmed)) {
-        mode = "events";
-      } else {
-        return;
-      }
-    }
-
-    if (mode === "events") {
-      eventLines.push(trimmed);
-      return;
-    }
-
-    if (looksLikeOrderLine(trimmed)) {
-      serviceOrder.push(parseOrderLine(trimmed));
-      return;
-    }
-
-    if (/행사명\s*:|일시\s*:|장소\s*:|대상\s*:|문의\s*:|신청\s*:/.test(trimmed)) {
-      eventLines.push(trimmed);
-    }
+    current.lines.push(trimmed);
   });
 
-  const events = parseEventsFromLines(eventLines);
+  const serviceSection = sections.find((section) => section.title.includes("예배 순서"));
+  const serviceOrder = serviceSection ? parseServiceOrderFromLines(serviceSection.lines) : [];
+
+  const eventSection = sections.find((section) => section.title.includes("교회 소식") || section.title.includes("행사"));
+  const events = eventSection ? parseEventsFromLines(eventSection.lines) : [];
+
+  const bulletinSections = sections
+    .filter((section) => section.lines.some((line) => line.trim()))
+    .map((section) => ({
+      title: section.title,
+      lines: section.lines.filter((line) => line.trim())
+    }));
 
   return {
     title,
     dateLabelRaw,
     serviceOrder,
     events,
-    coverImage: ""
+    bulletinSections
   };
+}
+
+function isBulletinHeader(text) {
+  const cleaned = text.replace(/[\[\]()]/g, "").trim();
+  const known = [
+    "예배 순서",
+    "예배안내",
+    "성도의 교제",
+    "지난 주 헌금",
+    "교회 소식",
+    "교우 동정",
+    "교우동정",
+    "중보기도 제목",
+    "중보기도",
+    "교회력",
+    "주중 모임"
+  ];
+
+  if (known.some((header) => cleaned.includes(header))) return true;
+
+  return /순서|안내|헌금|소식|동정|교제|기도|교회력/.test(cleaned) && cleaned.length <= 20;
+}
+
+function normalizeHeader(text) {
+  return text.replace(/[\[\]()]/g, "").replace(/\s+/g, " ").trim();
+}
+
+function parseServiceOrderFromLines(lines) {
+  return lines
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .filter((line) => /\|/.test(line) || /^([0-2]?\d:[0-5]\d)/.test(line))
+    .map((line) => {
+      const chunks = line.split("|").map((chunk) => chunk.trim());
+
+      if (chunks.length >= 3) {
+        return { time: chunks[0], title: chunks[1], person: chunks.slice(2).join(" | ") };
+      }
+
+      if (chunks.length === 2) {
+        return { time: "", title: chunks[0], person: chunks[1] };
+      }
+
+      const timeMatch = line.match(/^([0-2]?\d:[0-5]\d)\s*(.+)$/);
+      if (timeMatch) {
+        return { time: timeMatch[1], title: timeMatch[2], person: "" };
+      }
+
+      return { time: "", title: line, person: "" };
+    });
+}
+
+function parseEventsFromLines(lines) {
+  const cleanedLines = lines.map((line) => line.trim()).filter(Boolean);
+
+  const blocks = [];
+  let current = [];
+
+  cleanedLines.forEach((line) => {
+    const isNewBlock = /^\d+[.)]/.test(line) || /^행사명\s*:/.test(line);
+    if (isNewBlock && current.length > 0) {
+      blocks.push(current);
+      current = [];
+    }
+    current.push(line);
+  });
+
+  if (current.length > 0) blocks.push(current);
+
+  return blocks.map((rows) => {
+    const event = {
+      title: rows[0].replace(/^\d+[.)]\s*/, "") || "행사 안내",
+      date: "",
+      place: "",
+      target: "",
+      description: "",
+      apply: "",
+      contact: "",
+      extra: []
+    };
+
+    rows.forEach((row) => {
+      const clean = row.replace(/^\d+[.)]\s*/, "").trim();
+      const [rawKey, ...rest] = clean.split(":");
+
+      if (rest.length === 0) {
+        if (clean !== event.title) event.extra.push(clean);
+        return;
+      }
+
+      const key = rawKey.trim();
+      const value = rest.join(":").trim();
+
+      if (["행사명", "제목", "행사"].includes(key)) event.title = value;
+      else if (["일시", "날짜", "시간"].includes(key)) event.date = value;
+      else if (["장소", "위치"].includes(key)) event.place = value;
+      else if (["대상", "참석대상"].includes(key)) event.target = value;
+      else if (["내용", "소개", "설명"].includes(key)) event.description = value;
+      else if (["신청", "신청방법", "접수"].includes(key)) event.apply = value;
+      else if (["문의", "문의처", "연락"].includes(key)) event.contact = value;
+      else event.extra.push(`${key}: ${value}`);
+    });
+
+    return event;
+  });
 }
 
 function makeDateInfo(rawDateLabel) {
@@ -240,81 +332,6 @@ function parsePairLine(value) {
   }
 
   return null;
-}
-
-function parseEventsFromLines(lines) {
-  const blocks = lines
-    .join("\n")
-    .split(/\n\s*\n/)
-    .map((block) => block.trim())
-    .filter(Boolean);
-
-  return blocks.map((block) => {
-    const event = {
-      title: "행사 안내",
-      date: "",
-      place: "",
-      target: "",
-      description: "",
-      apply: "",
-      contact: "",
-      extra: []
-    };
-
-    const rows = block
-      .split("\n")
-      .map((line) => line.trim())
-      .filter(Boolean);
-
-    rows.forEach((row, index) => {
-      const [rawKey, ...rest] = row.split(":");
-      if (rest.length === 0) {
-        if (index === 0 && event.title === "행사 안내") {
-          event.title = row;
-        } else {
-          event.extra.push(row);
-        }
-        return;
-      }
-
-      const key = rawKey.trim();
-      const value = rest.join(":").trim();
-
-      if (["행사명", "제목", "행사"].includes(key)) event.title = value;
-      else if (["일시", "날짜", "시간"].includes(key)) event.date = value;
-      else if (["장소", "위치"].includes(key)) event.place = value;
-      else if (["대상", "참석대상"].includes(key)) event.target = value;
-      else if (["내용", "소개", "설명"].includes(key)) event.description = value;
-      else if (["신청", "신청방법", "접수"].includes(key)) event.apply = value;
-      else if (["문의", "문의처", "연락"].includes(key)) event.contact = value;
-      else event.extra.push(`${key}: ${value}`);
-    });
-
-    return event;
-  });
-}
-
-function looksLikeOrderLine(line) {
-  return /\|/.test(line) || /^([0-2]?\d:[0-5]\d)/.test(line);
-}
-
-function parseOrderLine(line) {
-  const chunks = line.split("|").map((chunk) => chunk.trim());
-
-  if (chunks.length >= 3) {
-    return { time: chunks[0], title: chunks[1], person: chunks.slice(2).join(" | ") };
-  }
-
-  if (chunks.length === 2) {
-    return { time: "", title: chunks[0], person: chunks[1] };
-  }
-
-  const timeMatch = line.match(/^([0-2]?\d:[0-5]\d)\s*(.+)$/);
-  if (timeMatch) {
-    return { time: timeMatch[1], title: timeMatch[2], person: "" };
-  }
-
-  return { time: "", title: line, person: "" };
 }
 
 function extractImageUrl(line) {
