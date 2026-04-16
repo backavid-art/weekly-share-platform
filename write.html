@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>기사 작성기 | 주간 기사 공유 플랫폼</title>
-    <meta name="description" content="주간 기사 공유용 글을 쉽게 작성해 weeks.js 코드로 변환" />
+    <meta name="description" content="소식기사/주보내용 두 입력으로 자동 주간 콘텐츠 생성" />
     <link rel="stylesheet" href="./assets/styles.css" />
   </head>
   <body>
@@ -15,9 +15,10 @@
       <div class="site-header-top">
         <div>
           <p class="eyebrow">Writer Tool</p>
-          <h1>기사 작성기</h1>
+          <h1>2-입력 기사 작성기</h1>
           <p class="site-intro">
-            입력창에 내용만 쓰면 <code>content/weeks.js</code>에 붙여넣을 코드가 자동 생성됩니다.
+            입력은 두 가지만 받습니다. <code>소식기사 원문</code> + <code>주보내용 원문</code>을 넣으면
+            자동으로 <code>weeks.js</code> 코드가 생성됩니다.
           </p>
         </div>
         <a class="quick-link" href="./index.html">메인 페이지 보기</a>
@@ -27,83 +28,32 @@
     <main class="writer-layout">
       <section class="panel">
         <div class="panel-header">
-          <h2>1) 기사 내용 입력</h2>
-          <p class="subtle">기사/사진/예배순서/행사 원문을 넣으면 자동 코드로 변환됩니다.</p>
-        </div>
-
-        <div class="writer-grid two">
-          <label>
-            주차 ID
-            <input id="id" type="text" placeholder="2026-04-23" />
-          </label>
-          <label>
-            날짜 표시
-            <input id="dateLabel" type="text" placeholder="2026.04.23 (목)" />
-          </label>
+          <h2>1) 입력 (2개만)</h2>
+          <p class="subtle">대충 넣어도 자동 파싱해 최대한 예쁘게 배치합니다.</p>
         </div>
 
         <div class="writer-grid">
           <label>
-            제목
-            <input id="title" type="text" placeholder="이번 주 주요 기사 요약" />
-          </label>
-
-          <label>
-            한 줄 요약
-            <input id="summary" type="text" placeholder="이번 주 핵심 흐름을 한 줄로 정리" />
-          </label>
-
-          <label>
-            대표 이미지 경로/URL
-            <input id="coverImage" type="text" placeholder="./assets/images/weekly-2026-04-23.jpg" />
-          </label>
-
-          <label>
-            사진 목록 (한 줄에 하나, 형식: 설명 | 경로 또는 URL)
+            소식기사 원문 (사진경로/URL, 링크, 본문을 함께 붙여넣기)
             <textarea
-              id="galleryImages"
-              placeholder="주보 전체 이미지 | ./assets/images/weekly-2026-04-23.jpg&#10;행사 사진 1 | ./assets/images/event-01.jpg"
-            ></textarea>
-          </label>
-
-          <label>
-            본문 (쉬운 작성 모드)
-            <textarea
-              id="articleText"
+              id="newsRaw"
               class="article-input"
-              placeholder="## 핵심 정리\n이번 주 핵심을 2~3문장으로 입력\n\n## 주요 포인트\n- 포인트 1\n- 포인트 2\n\n## 실천 제안\n한 가지 실천 제안"
+              placeholder="제목: 4월 넷째 주 교회 소식&#10;대표이미지: ./assets/images/weekly-2026-04-23.jpg&#10;사진: ./assets/images/news-01.jpg&#10;사진: https://example.com/news-02.jpg&#10;링크: 원문 기사 | https://example.com/article&#10;&#10;이번 주 소식 본문을 자유롭게 붙여넣으세요.&#10;- 포인트 1&#10;- 포인트 2"
             ></textarea>
           </label>
 
           <label>
-            참고 링크 (한 줄에 하나, 형식: 제목 | URL)
-            <textarea id="links" placeholder="원문 기사 | https://example.com/article\n관련 기사 | https://example.com/related"></textarea>
-          </label>
-
-          <label>
-            예배 순서 (한 줄에 하나, 형식: 시간 | 순서 | 담당)
+            주보내용 원문 (예배순서/행사/광고를 그대로 붙여넣기)
             <textarea
-              id="serviceOrderRaw"
-              placeholder="10:50 | 예배 준비 | 인도자&#10;11:00 | 찬양 | 찬양팀&#10;11:05 | 기도 | 대표기도자&#10;11:15 | 말씀봉독 | 사회자&#10;11:20 | 설교 | 담임목사"
+              id="bulletinRaw"
+              class="article-input"
+              placeholder="날짜: 2026.04.23 (목)&#10;예배순서&#10;10:50 | 예배 준비 | 인도자&#10;11:00 | 찬양 | 찬양팀&#10;11:05 | 기도 | 대표기도자&#10;11:20 | 말씀 선포 | 담임목사&#10;&#10;행사 안내&#10;행사명: 교사 기도회&#10;일시: 2026.04.24(금) 20:00&#10;장소: 비전홀&#10;대상: 교사/교역자&#10;문의: 교육부장 010-0000-0000&#10;&#10;행사명: 청년 수련회&#10;일시: 2026.05.02(토)-05.03(주일)&#10;장소: 수양관&#10;대상: 청년부&#10;신청: 4월 25일까지"
             ></textarea>
-          </label>
-
-          <label>
-            행사 안내 (블록 단위, 각 블록은 빈 줄로 구분)
-            <textarea
-              id="eventsRaw"
-              placeholder="행사명: 교사 기도회&#10;일시: 2026.04.24(금) 20:00&#10;장소: 비전홀&#10;대상: 교사/교역자&#10;내용: 다음세대 사역 나눔&#10;문의: 교육부장 010-0000-0000&#10;&#10;행사명: 청년 수련회&#10;일시: 2026.05.02(토)-05.03(주일)&#10;장소: 수양관&#10;대상: 청년부&#10;신청: 4월 25일까지&#10;문의: 청년부 리더"
-            ></textarea>
-          </label>
-
-          <label>
-            첨부 자료 (한 줄에 하나, 형식: 제목 | URL)
-            <textarea id="attachments" placeholder="주간 PDF | https://example.com/weekly.pdf"></textarea>
           </label>
         </div>
 
         <div class="writer-actions">
-          <button id="generate" type="button">코드 생성</button>
+          <button id="generate" type="button">자동 코드 생성</button>
           <button id="copy" type="button" class="secondary">코드 복사</button>
         </div>
       </section>
@@ -111,7 +61,7 @@
       <section class="panel">
         <div class="panel-header">
           <h2>2) 생성된 코드</h2>
-          <p class="subtle">이 코드를 weeks 배열 맨 위에 붙여넣으세요.</p>
+          <p class="subtle">이 코드를 <code>content/weeks.js</code>의 <code>weeks</code> 맨 위에 붙여넣으세요.</p>
         </div>
         <pre id="snippet" class="snippet-box">아직 생성된 코드가 없습니다.</pre>
       </section>
