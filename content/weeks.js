@@ -11,8 +11,29 @@ window.WEEKLY_CONTENT = {
       summary:
         "이번 주에는 핵심 이슈 3건을 중심으로 배경, 시사점, 실천 포인트를 간단히 정리했습니다.",
       coverImage: "./assets/images/weekly-2026-04-16.jpg",
+      galleryImages: [
+        { caption: "주보 전체 이미지", url: "./assets/images/weekly-2026-04-16.jpg" }
+      ],
       articleText:
         "## 핵심 정리\n이번 주 가장 중요한 흐름을 2~3문장으로 요약합니다.\n현장에 적용할 포인트를 함께 적으면 전달력이 높아집니다.\n\n## 주요 포인트\n- 기사에서 놓치면 안 되는 문장 1개\n- 기사 배경 맥락 1개\n- 우리 공동체에 주는 의미 1개\n\n## 실천 제안\n이번 주 안에 실행할 수 있는 작은 행동 한 가지를 제안해 보세요.",
+      serviceOrder: [
+        { time: "10:50", title: "예배 준비", person: "인도자" },
+        { time: "11:00", title: "찬양", person: "찬양팀" },
+        { time: "11:05", title: "대표 기도", person: "기도자" },
+        { time: "11:20", title: "말씀 선포", person: "담임목사" }
+      ],
+      events: [
+        {
+          title: "교사 기도회",
+          date: "2026.04.24(금) 20:00",
+          place: "비전홀",
+          target: "교사/교역자",
+          description: "다음세대 사역 나눔",
+          apply: "",
+          contact: "교육부장 010-0000-0000",
+          extra: []
+        }
+      ],
       sections: [
         {
           heading: "핵심 포인트 1",

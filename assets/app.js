@@ -48,6 +48,9 @@ function renderWeek(week) {
     .join("");
 
   const articleTextHtml = renderArticleText(week.articleText || "");
+  const galleryHtml = renderGallery(week.galleryImages || []);
+  const serviceOrderHtml = renderServiceOrder(week.serviceOrder || []);
+  const eventsHtml = renderEvents(week.events || []);
 
   const linksHtml = (week.links || [])
     .map(
@@ -73,7 +76,10 @@ function renderWeek(week) {
     }
     <h3>${escapeHtml(week.title || "제목 없음")}</h3>
     <p class="week-summary">${escapeHtml(week.summary || "")}</p>
+    ${galleryHtml}
     ${articleTextHtml}
+    ${serviceOrderHtml}
+    ${eventsHtml}
     ${sectionsHtml}
     ${linksHtml ? `<h4>참고 링크</h4><ul class="link-list">${linksHtml}</ul>` : ""}
     ${attachmentsHtml ? `<h4>첨부 자료</h4><ul class="attachment-list">${attachmentsHtml}</ul>` : ""}
@@ -118,6 +124,96 @@ function renderArticleText(articleText) {
       return `<p class="article-paragraph">${paragraph}</p>`;
     })
     .join("");
+}
+
+function renderGallery(galleryImages) {
+  if (!Array.isArray(galleryImages) || galleryImages.length === 0) return "";
+
+  const items = galleryImages
+    .map((image) => {
+      const item = typeof image === "string" ? { url: image, caption: "" } : image;
+      if (!item.url) return "";
+      return `
+        <figure class="gallery-item">
+          <img src="${escapeAttr(item.url)}" alt="${escapeAttr(item.caption || "기사 이미지")}" />
+          ${item.caption ? `<figcaption>${escapeHtml(item.caption)}</figcaption>` : ""}
+        </figure>
+      `;
+    })
+    .join("");
+
+  if (!items) return "";
+
+  return `
+    <section class="info-block">
+      <h4 class="info-title">사진 모음</h4>
+      <div class="gallery-grid">${items}</div>
+    </section>
+  `;
+}
+
+function renderServiceOrder(serviceOrder) {
+  if (!Array.isArray(serviceOrder) || serviceOrder.length === 0) return "";
+
+  const rows = serviceOrder
+    .map(
+      (item) => `
+      <tr>
+        <td>${escapeHtml(item.time || "-")}</td>
+        <td>${escapeHtml(item.title || "")}</td>
+        <td>${escapeHtml(item.person || "-")}</td>
+      </tr>
+    `
+    )
+    .join("");
+
+  return `
+    <section class="info-block">
+      <h4 class="info-title">예배 순서</h4>
+      <div class="order-table-wrap">
+        <table class="order-table">
+          <thead>
+            <tr><th>시간</th><th>순서</th><th>담당</th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </section>
+  `;
+}
+
+function renderEvents(events) {
+  if (!Array.isArray(events) || events.length === 0) return "";
+
+  const cards = events
+    .map((event) => {
+      const extras = Array.isArray(event.extra)
+        ? event.extra.map((extra) => `<li>${escapeHtml(extra)}</li>`).join("")
+        : "";
+
+      return `
+        <article class="event-card">
+          <h5>${escapeHtml(event.title || "행사 안내")}</h5>
+          <dl>
+            ${event.date ? `<div><dt>일시</dt><dd>${escapeHtml(event.date)}</dd></div>` : ""}
+            ${event.place ? `<div><dt>장소</dt><dd>${escapeHtml(event.place)}</dd></div>` : ""}
+            ${event.target ? `<div><dt>대상</dt><dd>${escapeHtml(event.target)}</dd></div>` : ""}
+            ${event.description ? `<div><dt>내용</dt><dd>${escapeHtml(event.description)}</dd></div>` : ""}
+            ${event.apply ? `<div><dt>신청</dt><dd>${escapeHtml(event.apply)}</dd></div>` : ""}
+            ${event.contact ? `<div><dt>문의</dt><dd>${escapeHtml(event.contact)}</dd></div>` : ""}
+          </dl>
+          ${extras ? `<ul class="event-extra">${extras}</ul>` : ""}
+        </article>
+      `;
+    })
+    .join("");
+
+  return `
+    <section class="info-block">
+      <h4 class="info-title">행사 안내</h4>
+      <div class="events-grid">${cards}</div>
+    </section>
+  `;
 }
 
 function renderArchive(weeks, currentId, onPick) {
