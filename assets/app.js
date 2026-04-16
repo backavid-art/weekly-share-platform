@@ -76,11 +76,11 @@ function renderWeek(week) {
     }
     <h3>${escapeHtml(week.title || "제목 없음")}</h3>
     <p class="week-summary">${escapeHtml(week.summary || "")}</p>
-    ${galleryHtml}
-    ${articleTextHtml}
     ${serviceOrderHtml}
     ${eventsHtml}
+    ${articleTextHtml}
     ${sectionsHtml}
+    ${galleryHtml}
     ${linksHtml ? `<h4>참고 링크</h4><ul class="link-list">${linksHtml}</ul>` : ""}
     ${attachmentsHtml ? `<h4>첨부 자료</h4><ul class="attachment-list">${attachmentsHtml}</ul>` : ""}
   `;
