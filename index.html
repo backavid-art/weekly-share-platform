@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>주간 기사 공유 플랫폼</title>
+    <meta
+      name="description"
+      content="매주 같은 레이아웃으로 기사/소식을 공유하는 반응형 웹페이지"
+    />
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <header class="site-header">
+      <p class="eyebrow">Weekly Brief Platform</p>
+      <h1 id="site-title">주간 기사 공유</h1>
+      <p id="site-intro" class="site-intro"></p>
+    </header>
+
+    <main class="layout">
+      <section class="panel main-panel" aria-labelledby="current-week-heading">
+        <div class="panel-header">
+          <h2 id="current-week-heading">이번 주 콘텐츠</h2>
+          <p id="current-week-date" class="subtle"></p>
+        </div>
+
+        <article id="current-week" class="week-detail"></article>
+      </section>
+
+      <aside class="panel side-panel" aria-labelledby="archive-heading">
+        <div class="panel-header">
+          <h2 id="archive-heading">지난 주 아카이브</h2>
+          <p class="subtle">카드를 누르면 본문이 바뀝니다.</p>
+        </div>
+        <div id="archive-list" class="archive-list"></div>
+      </aside>
+    </main>
+
+    <footer class="site-footer">
+      <p id="site-contact"></p>
+    </footer>
+
+    <script src="./content/weeks.js"></script>
+    <script src="./assets/app.js"></script>
+  </body>
+</html>
